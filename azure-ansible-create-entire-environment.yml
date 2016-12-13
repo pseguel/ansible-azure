@@ -1,3 +1,17 @@
+################################################################################################
+# Creating an Entire Environment in Microsoft Azure                                            #
+#                                                                                              #
+# By Robert J. Calva - Red Hat LATAM - 2016                                                    #
+#                                                                                              #
+# NOTE: just set the location, Resoruce Group, Storage Account, Virtual Network, Public IP,    #
+# Security Group and more variables as you wish!                                               #
+#                                                                                              #
+# IMPORTANT: for further information about Microsoft Azure, please take a look at this link:   #
+# https://docs.microsoft.com/en-us/azure/                                                      #
+#                                                                                              #
+# Enjoy!                                                                                       #
+################################################################################################
+
 - name: Create an entire Environment in Azure
   hosts: localhost
   gather_facts: false
@@ -17,8 +31,7 @@
         - vmsize: Basic_A0 
         - username: centos
 #        - password: Redhat1!
-        - sshkeys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIaLMQPfouddXc7+jtx+QPpgBcJoLuOt5WRbhFfeRx5UcC4OBDTNdmrQmbEaOUB3c7OMRgPu/DwY1WlsuDGVqdystlGrGvJuGK8DCJWQzHUJDp6uaINLcwCCeR7XNQR8Y39ToVCmXHM2YMx1g0PXlbRx4QLfNHXupEfggEhGpQzA9bN/rCCDXB1Plt6UJBar3W+qy1JIslMIDXV3oMeor0XymPJxMBpt0fNPBpIYEF7BzGWPW1QZ8mhjO18k8vcgAeIzqkE1i48Yk04LHbdLfnIUDA/ZEm1gxpGrHx9evPgDx7yfnLY58N127U71sb4ZLadY1HGbz/IJC9FyNoQHXZ rcalvaga@azulman.mx.redhat.com
-
+        - sshkeys: [put your pub-key here]
   tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
