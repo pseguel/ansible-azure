@@ -1,0 +1,94 @@
+- name: Create an entire Environment in Azure
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+        - location: centralus
+        - resourcegroup: Testing
+        - storageaccount: teststorageaccount1326
+        - virtualnetwork: testvirtualnet01
+        - address_prefix: 10.10.0.0/16
+        - subnet: testsubnet01
+        - subnet_prefix: 10.10.0.0/24
+        - publicip: testpublicip01
+        - secgroup: testsecgroup01
+        - nicname: testnic01
+        - vmname: testvm02
+        - vmsize: Basic_A0 
+        - username: centos
+#        - password: Redhat1!
+        - sshkeys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIaLMQPfouddXc7+jtx+QPpgBcJoLuOt5WRbhFfeRx5UcC4OBDTNdmrQmbEaOUB3c7OMRgPu/DwY1WlsuDGVqdystlGrGvJuGK8DCJWQzHUJDp6uaINLcwCCeR7XNQR8Y39ToVCmXHM2YMx1g0PXlbRx4QLfNHXupEfggEhGpQzA9bN/rCCDXB1Plt6UJBar3W+qy1JIslMIDXV3oMeor0XymPJxMBpt0fNPBpIYEF7BzGWPW1QZ8mhjO18k8vcgAeIzqkE1i48Yk04LHbdLfnIUDA/ZEm1gxpGrHx9evPgDx7yfnLY58N127U71sb4ZLadY1HGbz/IJC9FyNoQHXZ rcalvaga@azulman.mx.redhat.com
+
+  tasks:
+    - name: Create a resource group
+      azure_rm_resourcegroup:
+        name: "{{ resourcegroup }}"
+        location: "{{ location }}"
+        state: present
+
+    - name: Create storage account
+      azure_rm_storageaccount:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ storageaccount }}"
+        account_type: Standard_LRS
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ virtualnetwork }}"
+        address_prefixes: "{{ address_prefix }}"
+
+    - name: Add subnet
+      azure_rm_subnet:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ subnet }}"
+        address_prefix: "{{ subnet_prefix }}"
+        virtual_network: "{{ virtualnetwork }}"
+
+    - name: Create public ip
+      azure_rm_publicipaddress:
+        resource_group: "{{ resourcegroup }}"
+        allocation_method: Static
+        name: "{{ publicip }}"
+
+    - name: Create security group that allows SSH
+      azure_rm_securitygroup:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ secgroup }}"
+        rules:
+          - name: SSH
+            protocol: Tcp
+            destination_port_range: 22
+            access: Allow
+            priority: 101
+            direction: Inbound
+
+    - name: Create NIC
+      azure_rm_networkinterface:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ nicname }}"
+        virtual_network: "{{ virtualnetwork }}"
+        subnet: "{{ subnet }}"
+        public_ip_name: "{{ publicip }}"
+        security_group: "{{ secgroup }}"
+
+    - name: Create virtual machine
+      azure_rm_virtualmachine:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ vmname }}"
+        vm_size: "{{ vmsize }}"
+        storage_account: "{{ storageaccount }}"
+        storage_container: "{{ vmname }}"
+        storage_blob: "{{ vmname }}.vhd"
+        admin_username: "{{ username }}"
+#        admin_password: "{{ password }}"
+        ssh_password_enabled: False
+        ssh_public_keys: 
+           - path: /home/{{ username }}/.ssh/authorized_keys
+             key_data: "{{ sshkeys }}" 
+        network_interfaces: "{{ nicname }}"
+        image:
+          offer: CentOS
+          publisher: OpenLogic
+          sku: '7.1'
+          version: latest
