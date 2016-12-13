@@ -1,0 +1,75 @@
+- name: Create an entire Environment in Azure
+  hosts: all
+  tasks:
+    - name: Create a resource group
+      azure_rm_resourcegroup:
+        name: "{{ resourcegroup }}"
+        location: "{{ location }}"
+        state: present
+
+    - name: Create storage account
+      azure_rm_storageaccount:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ storageaccount }}"
+        account_type: Standard_LRS
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ virtualnetwork }}"
+        address_prefixes: "{{ address_prefix }}"
+
+    - name: Add subnet
+      azure_rm_subnet:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ subnet }}"
+        address_prefix: "{{ subnet_prefix }}"
+        virtual_network: "{{ virtualnetwork }}"
+
+    - name: Create public ip
+      azure_rm_publicipaddress:
+        resource_group: "{{ resourcegroup }}"
+        allocation_method: Static
+        name: "{{ publicip }}"
+
+    - name: Create security group that allows SSH
+      azure_rm_securitygroup:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ secgroup }}"
+        rules:
+          - name: SSH
+            protocol: Tcp
+            destination_port_range: 22
+            access: Allow
+            priority: 101
+            direction: Inbound
+
+    - name: Create NIC
+      azure_rm_networkinterface:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ nicname }}"
+        virtual_network: "{{ virtualnetwork }}"
+        subnet: "{{ subnet }}"
+        public_ip_name: "{{ publicip }}"
+        security_group: "{{ secgroup }}"
+
+    - name: Create virtual machine
+      azure_rm_virtualmachine:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ vmname }}"
+        vm_size: "{{ vmsize }}"
+        storage_account: "{{ storageaccount }}"
+        storage_container: "{{ vmname }}"
+        storage_blob: "{{ vmname }}.vhd"
+        admin_username: "{{ username }}"
+#        admin_password: "{{ password }}"
+        ssh_password_enabled: False
+        ssh_public_keys: 
+           - path: /home/{{ username }}/.ssh/authorized_keys
+             key_data: "{{ sshkeys }}" 
+        network_interfaces: "{{ nicname }}"
+        image:
+          offer: CentOS
+          publisher: OpenLogic
+          sku: '7.1'
+          version: latest
