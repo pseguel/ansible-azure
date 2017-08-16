@@ -13,6 +13,7 @@
 ################################################################################################
 - name: Create an entire Environment in Azure
   hosts: all
+  connection: local
   tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
