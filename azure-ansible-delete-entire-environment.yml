@@ -1,0 +1,82 @@
+################################################################################################
+# Deleting an Entire Environment in Microsoft Azure                                            #
+#                                                                                              #
+# By Robert J. Calva - Red Hat LATAM - 2016                                                    #
+#                                                                                              #
+# NOTE: just set the location, Resoruce Group, Storage Account, Virtual Network, Public IP,    #
+# Security Group and more variables as you wish!                                               #
+#                                                                                              #
+# IMPORTANT: for further information about Microsoft Azure, please take a look at this link:   #
+# https://docs.microsoft.com/en-us/azure/                                                      #
+#                                                                                              #
+# Enjoy!                                                                                       #
+################################################################################################
+
+- name: Delete an entire Environment in Azure
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+        - location: centralus
+        - resourcegroup: Test
+        - storageaccount: test13267
+        - virtualnetwork: Test
+        - address_prefix: 10.10.0.0/16
+        - subnet: test-subnet
+        - subnet_prefix: 10.10.0.0/24
+        - publicip: testpublicip01
+        - nicname: testnic01
+        - vmname: vmtest01
+  tasks:
+    - name: Delete virtual machine
+      azure_rm_virtualmachine:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ vmname }}"
+        storage_account: "{{ storageaccount }}"
+        storage_container: "{{ vmname }}"
+        storage_blob: "{{ vmname }}.vhd"
+        state: absent
+
+    - name: Delete NIC
+      azure_rm_networkinterface:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ nicname }}"
+        virtual_network: "{{ virtualnetwork }}"
+        subnet: "{{ subnet }}"
+        public_ip_name: "{{ publicip }}"
+        security_group: "{{ nicname }}"
+        state: absent
+
+    - name: Delete subnet
+      azure_rm_subnet:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ subnet }}"
+        address_prefix: "{{ subnet_prefix }}"
+        virtual_network: "{{ virtualnetwork }}"
+        state: absent
+
+    - name: Delete virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ virtualnetwork }}"
+        address_prefixes: "{{ address_prefix }}"
+        state: absent
+
+    - name: Delete security group
+      azure_rm_securitygroup:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ nicname }}"
+        state: absent
+
+    - name: Delete storage account
+      azure_rm_storageaccount:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ storageaccount }}"
+        state: absent
+        account_type: Standard_LRS
+
+    - name: Delete a resource group
+      azure_rm_resourcegroup:
+        name: "{{ resourcegroup }}"
+        location: "{{ location }}"
+        state: absent
