@@ -18,26 +18,49 @@
   connection: local
   vars:
         - location: centralus
-        - resourcegroup: Testing
-        - storageaccount: teststorageaccount1326
-        - virtualnetwork: testvirtualnet01
+        - resourcegroup: Test
+        - storageaccount: test13267
+        - virtualnetwork: Test
         - address_prefix: 10.10.0.0/16
-        - subnet: testsubnet01
+        - subnet: test-subnet
         - subnet_prefix: 10.10.0.0/24
         - publicip: testpublicip01
-        - secgroup: testsecgroup01
         - nicname: testnic01
-        - vmname: testvm02
+        - vmname: vmtest01
         - vmsize: Basic_A0 
         - username: centos
-#        - password: Redhat1!
-        - sshkeys: [put your pub-key here]
+        - sshkeys:
   tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
         name: "{{ resourcegroup }}"
         location: "{{ location }}"
         state: present
+
+    - name: Create a security group
+      azure_rm_securitygroup:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ nicname }}"
+        purge_rules: yes
+        rules:
+           - name: Allow
+             protocol: Tcp
+             destination_port_range: 22
+             access: Allow
+             priority: 100
+             direction: Inbound
+           - name: 'AllowHTTP'
+             protocol: Tcp
+             destination_port_range: 80
+             access: Allow
+             priority: 101
+             direction: Inbound
+           - name: 'AllowCockpit'
+             protocol: Tcp
+             destination_port_range: 9090
+             access: Allow
+             priority: 102
+             direction: Inbound
 
     - name: Create storage account
       azure_rm_storageaccount:
@@ -64,18 +87,6 @@
         allocation_method: Static
         name: "{{ publicip }}"
 
-    - name: Create security group that allows SSH
-      azure_rm_securitygroup:
-        resource_group: "{{ resourcegroup }}"
-        name: "{{ secgroup }}"
-        rules:
-          - name: SSH
-            protocol: Tcp
-            destination_port_range: 22
-            access: Allow
-            priority: 101
-            direction: Inbound
-
     - name: Create NIC
       azure_rm_networkinterface:
         resource_group: "{{ resourcegroup }}"
@@ -83,7 +94,7 @@
         virtual_network: "{{ virtualnetwork }}"
         subnet: "{{ subnet }}"
         public_ip_name: "{{ publicip }}"
-        security_group: "{{ secgroup }}"
+        security_group: "{{ nicname }}"
 
     - name: Create virtual machine
       azure_rm_virtualmachine:
@@ -105,3 +116,57 @@
           publisher: OpenLogic
           sku: '7.1'
           version: latest
+      register: azurevm
+
+    - name: Debugging AzureVM Public IP
+      debug: var=azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress
+
+    - name: Setting AzureVM Public IP
+      set_fact: host={{ azurevm.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}
+
+    - name: Save host data within a Group
+      add_host:
+        hostname: "{{ host }}"
+        groupname: azure_instances_temp
+
+    - name: Wait for SSH to come up
+      wait_for: host={{ host }} port=22 delay=10 timeout=60
+
+- name: Configure Hosts post-creation
+  hosts: azure_instances_temp
+  gather_facts: True
+  remote_user: centos
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Install Cockpit Console
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+    - cockpit 
+    - cockpit-dashboard
+
+  - name: Start Cockpit Service
+    service:
+      name: cockpit.socket
+      state: started
+      enabled: yes
+    
+  - name: install Apache
+    yum: 
+      name: httpd
+      state: latest
+
+  - name: start Apache Service
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+
+  - name: create Ansible user
+    user:
+     name: ansible
+     comment: "Ansible User created by Ansible"
+     password: $1$ctRQ8kmb$PMF.2YAjQrdjiDGFuE4uw0
+     group: wheel
