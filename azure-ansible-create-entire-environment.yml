@@ -164,9 +164,9 @@
       state: started
       enabled: yes
 
-  - name: create Ansible user
+  - name: create Test user
     user:
-     name: ansible
-     comment: "Ansible User created by Ansible"
+     name: test
+     comment: "Test User created by Ansible"
      password: $1$ctRQ8kmb$PMF.2YAjQrdjiDGFuE4uw0
      group: wheel
