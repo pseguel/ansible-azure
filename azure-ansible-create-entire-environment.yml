@@ -1,7 +1,7 @@
 ################################################################################################
 # Creating an Entire Environment in Microsoft Azure                                            #
 #                                                                                              #
-# By Robert J. Calva - Red Hat LATAM - 2016                                                    #
+# By Robert J. Calva - Red Hat LATAM - 2018                                                    #
 #                                                                                              #
 # NOTE: just set the location, Resoruce Group, Storage Account, Virtual Network, Public IP,    #
 # Security Group and more variables as you wish!                                               #
