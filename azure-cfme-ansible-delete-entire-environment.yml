@@ -48,6 +48,12 @@
         public_ip_name: "{{ publicip }}"
         security_group: "{{ nicname }}"
         state: absent
+        
+    - name: Delete public ip
+      azure_rm_publicipaddress:
+        resource_group: "{{ resourcegroup }}"
+        name: "{{ publicip }}"
+        state: absent
 
     - name: Delete subnet
       azure_rm_subnet:
