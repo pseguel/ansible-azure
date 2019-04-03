@@ -67,7 +67,7 @@
     - name: Delete security group
       azure_rm_securitygroup:
         resource_group: "{{ resourcegroup }}"
-        name: "{{ nicname }}"
+        name: "{{ secgroup }}"
         state: absent
 
     - name: Delete storage account
