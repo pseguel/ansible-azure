@@ -1,0 +1,23 @@
+################################################################################################
+# Delete a SQL Service Instance in Microsoft Azure                                            #
+#                                                                                              #
+# By Robert J. Calva - Red Hat LATAM - 2019                                                    #
+#                                                                                              #
+# NOTE: just set the location, Resoruce Group, Storage Account, Virtual Network, Public IP,    #
+# Security Group and more variables as you wish!                                               #
+#                                                                                              #
+# IMPORTANT: for further information about Microsoft Azure, please take a look at this link:   #
+# https://docs.microsoft.com/en-us/azure/                                                      #
+#                                                                                              #
+# Enjoy!                                                                                       #
+################################################################################################
+- name: Delete SQL Service Instance in Microsoft Azure
+  hosts: all
+  connection: local
+  tasks:
+  - name: Delete SQL Server Service
+    azure_rm_sqlserver:
+      resource_group: "{{ resourcegroup }}"
+      name: "{{ server_name }}"
+      location: "{{ location }}"
+      state: absent
