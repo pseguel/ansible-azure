@@ -18,7 +18,7 @@
   - name: Create (or update) SQL Server
     azure_rm_sqlserver:
       resource_group: "{{ resourcegroup }}"
-      name: server_name
+      name: "{{ server_name }}"
       location: "{{ location }}"
       admin_username: "{{ admin_username }}"
       admin_password: "{{ admin_password }}"
