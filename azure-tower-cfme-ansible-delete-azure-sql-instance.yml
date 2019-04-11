@@ -21,3 +21,12 @@
       name: "{{ server_name }}"
       location: "{{ location }}"
       state: absent
+           
+  - name: Send email to user with SQL Service information
+    sendgrid:
+      api_key: "{{ sendgrid_api_key }}"
+      subject: "{{ sendgrid_subject }}"
+      body: "{{ sendgrid_body }}"
+      to_addresses: "{{ user_email }}"
+      html_body: yes
+      from_address: "{{ sendgrid_from_address }}"
