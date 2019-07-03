@@ -12,9 +12,17 @@
 # Enjoy!                                                                                       #
 ################################################################################################
 - name: Create an entire Environment in Azure
-  hosts: all
+  hosts: localhost
   connection: local
+  vars_files:
+    - vars.yml
+  
   tasks:
+    - name: Prepare random postfix
+      set_fact:
+        rpfx: "{{ 100000 | random }}"
+      run_once: yes
+
     - name: Create a resource group
       azure_rm_resourcegroup:
         name: "{{ resourcegroup }}"
@@ -31,14 +39,14 @@
       azure_rm_virtualnetwork:
         resource_group: "{{ resourcegroup }}"
         name: "{{ virtualnetwork }}"
-        address_prefixes: "{{ address_prefix }}"
+        address_prefixes_cidr: "{{ address_prefix }}"
 
     - name: Add subnet
       azure_rm_subnet:
         resource_group: "{{ resourcegroup }}"
         name: "{{ subnet }}"
-        address_prefix: "{{ subnet_prefix }}"
-        virtual_network: "{{ virtualnetwork }}"
+        address_prefix_cidr: "{{ subnet_prefix }}"
+        virtual_network_name: "{{ virtualnetwork }}"
 
     - name: Create public ip
       azure_rm_publicipaddress:
