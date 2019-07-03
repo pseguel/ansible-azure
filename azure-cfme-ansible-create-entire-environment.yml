@@ -17,7 +17,7 @@
   tasks:
     - name: Prepare random postfix
       set_fact:
-      rpfx: "{{ 100000 | random }}"
+        rpfx: "{{ 100000 | random }}"
       run_once: yes
 
   vars:
