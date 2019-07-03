@@ -56,6 +56,7 @@
     storageaccount: "{{ taggedvms.vms[0].storage_account_name }}"
     storageblob: "{{ taggedvms.vms[0].storage_blob_name }}"
     nicname: "{{ taggedvms.vms[0].network_interface_names[0] }}"
+    location: "eastus"
 
   tasks: 
     - name: Debug tagged resources
@@ -72,15 +73,8 @@
         name: "{{ vmname }}"
         state: absent
         remove_on_absent:
-          - network_interfaces
-          - virtual_storage
-#
-#    - name: Delete public ip
-#      azure_rm_publicipaddress:
-#        resource_group: "{{ resourcegroup }}"
-#        name: "{{ publicip }}"
-#        state: absent
-#
+          - all
+
 #    - name: Delete subnet
 #      azure_rm_subnet:
 #        resource_group: "{{ resourcegroup }}"
@@ -109,8 +103,8 @@
 #        state: absent
 #        account_type: Standard_LRS
 #
-#    - name: Delete a resource group
-#      azure_rm_resourcegroup:
-#        name: "{{ resourcegroup }}"
-#        location: "{{ location }}"
-#        state: absent
+    - name: Delete a resource group
+      azure_rm_resourcegroup:
+        name: "{{ resourcegroup }}"
+        location: "{{ location }}"
+        state: absent
