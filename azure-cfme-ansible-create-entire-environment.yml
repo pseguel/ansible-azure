@@ -34,21 +34,21 @@
         name: "{{ resourcegroup }}"
         location: "{{ location }}"
         state: present
-        tags: {{ tags }}
+        tags: "{{ tags }}"
 
     - name: Create storage account
       azure_rm_storageaccount:
         resource_group: "{{ resourcegroup }}"
         name: "{{ storageaccount }}"
         account_type: Standard_LRS
-        tags: {{ tags }}
+        tags: "{{ tags }}"
 
     - name: Create virtual network
       azure_rm_virtualnetwork:
         resource_group: "{{ resourcegroup }}"
         name: "{{ virtualnetwork }}"
         address_prefixes_cidr: "{{ address_prefix }}"
-        tags: {{ tags }}
+        tags: "{{ tags }}"
 
     - name: Add subnet
       azure_rm_subnet:
@@ -56,14 +56,14 @@
         name: "{{ subnet }}"
         address_prefix_cidr: "{{ subnet_prefix }}"
         virtual_network_name: "{{ virtualnetwork }}"
-        tags: {{ tags }}
+        tags: "{{ tags }}"
 
     - name: Create public ip
       azure_rm_publicipaddress:
         resource_group: "{{ resourcegroup }}"
         allocation_method: Static
         name: "{{ publicip }}"
-        tags: {{ tags }}
+        tags: "{{ tags }}"
 
     - name: Create security group that allows SSH
       azure_rm_securitygroup:
@@ -76,7 +76,7 @@
             access: Allow
             priority: 101
             direction: Inbound
-        tags: {{ tags }}
+        tags: "{{ tags }}"
 
     - name: Create NIC
       azure_rm_networkinterface:
@@ -86,7 +86,7 @@
         subnet: "{{ subnet }}"
         public_ip_name: "{{ publicip }}"
         security_group: "{{ secgroup }}"
-        tags: {{ tags }}
+        tags: "{{ tags }}"
 
     - name: Create virtual machine
       azure_rm_virtualmachine:
@@ -108,5 +108,5 @@
           publisher: OpenLogic
           sku: '7.1'
           version: latest
-        tags: {{ tags }}
+        tags: "{{ tags }}"
            
