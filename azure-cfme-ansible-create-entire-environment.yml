@@ -23,6 +23,7 @@
 - hosts: localhost
   vars:
     resourcegroup: "{{ resourcegroup_name }}{{ rpfx }}"
+    storageaccount: "{{ storageaccount_name }}{{ rpfx }}"
 
   tasks:
     - name: Create a resource group
