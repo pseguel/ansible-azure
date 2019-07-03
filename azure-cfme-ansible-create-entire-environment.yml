@@ -20,8 +20,10 @@
         rpfx: "{{ 100000 | random }}"
       run_once: yes
 
+- hosts: localhost
   vars:
     resourcegroup: "{{ resourcegroup_name }}{{ rpfx }}"
+
   tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
