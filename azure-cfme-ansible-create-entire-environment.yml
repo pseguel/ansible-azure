@@ -21,7 +21,7 @@
       run_once: yes
 
   vars:
-    resource_group: "{{ resourcegroup_name }}{{ rpfx }}"
+    resourcegroup: "{{ resourcegroup_name }}{{ rpfx }}"
   tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
