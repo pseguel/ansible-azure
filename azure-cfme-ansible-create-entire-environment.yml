@@ -14,13 +14,15 @@
 - name: Create an entire Environment in Azure
   hosts: localhost
   connection: local
-  
   tasks:
     - name: Prepare random postfix
       set_fact:
-        rpfx: "{{ 100000 | random }}"
+      rpfx: "{{ 100000 | random }}"
       run_once: yes
 
+  vars:
+    resource_group: "{{ resourcegroup_name }}{{ rpfx }}"
+  tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
         name: "{{ resourcegroup }}"
