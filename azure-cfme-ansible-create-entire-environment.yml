@@ -26,7 +26,7 @@
     storageaccount: "{{ storageaccount_name }}{{ rpfx }}"
     mytags:
       'family': "ansibletest{{ rpfx }}"
-      'creator': 'Ansible Tower'
+      'creator': "{{ createdby | default('Ansible') }}"
 
   tasks:
     - name: Create a resource group
