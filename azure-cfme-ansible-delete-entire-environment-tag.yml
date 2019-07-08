@@ -29,30 +29,38 @@
   hosts: localhost
   gather_facts: false
   connection: local
+  var: 
+  - mytags: ["family":"{{ familytags }}"]
 
   # Getting facts!
   tasks:
     - name: Get resource groups by tags
       azure_rm_resourcegroup_facts:
         tags: "{{ mytags }}"
-              #tags:
-              #- family:ansibletest76163
+        #tags:
+        #- family: "ansibletest215947"
       register: taggedresources 
+    
+    - name: Debug tagged resources
+      debug:
+        verbosity: 4
+        var: taggedresources
 
     - name: Get VMs by tags
       azure_rm_virtualmachine_facts:
         tags: "{{ mytags }}"
       register: taggedvms
 
-    - name: Get virtual network by tags
-      azure_rm_virtualnetwork_facts:
-        tags: "{{ mytags }}"
-      register: taggedvirtualnetwork
+#    - name: Get virtual network by tags
+#      azure_rm_virtualnetwork_facts:
+#        tags: "{{ mytags }}"
+#      register: taggedvirtualnetwork
            
 - hosts: localhost  
   vars: 
     resourcegroup: "{{ taggedresources.resourcegroups[0].name }}"
     vmname: "{{ taggedvms.vms[0].name }}"
+    virtualnetwork: "{{ taggedvirtualnetwork.subnets }}"
     storageaccount: "{{ taggedvms.vms[0].storage_account_name }}"
     storageblob: "{{ taggedvms.vms[0].storage_blob_name }}"
     nicname: "{{ taggedvms.vms[0].network_interface_names[0] }}"
@@ -61,19 +69,14 @@
   tasks: 
     - name: Debug tagged resources
       debug:
-        verbosity: 2
         var: taggedvms
-        #msg: 
-        # - "taggedsa: {{ storageaccount }}"
-        #  - "resourcegroup name (from var): {{ resourcegroup }}"
         
     - name: Delete virtual machine
       azure_rm_virtualmachine:
         resource_group: "{{ resourcegroup }}"
         name: "{{ vmname }}"
         state: absent
-        remove_on_absent:
-          - all
+        remove_on_absent: all
 
 #    - name: Delete subnet
 #      azure_rm_subnet:
@@ -102,9 +105,10 @@
 #        name: "{{ storageaccount }}"
 #        state: absent
 #        account_type: Standard_LRS
-#
+# 
     - name: Delete a resource group
       azure_rm_resourcegroup:
         name: "{{ resourcegroup }}"
         location: "{{ location }}"
+        force_delete_nonempty: yes
         state: absent
