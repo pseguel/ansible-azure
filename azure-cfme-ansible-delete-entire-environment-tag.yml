@@ -31,15 +31,13 @@
   connection: local
   vars: 
     mytags: 
-      family: "{{familytags }}"
+    - 'family:{{ familytags }}'
 
   # Getting facts!
   tasks:
     - name: Get resource groups by tags
       azure_rm_resourcegroup_facts:
         tags: "{{ mytags }}"
-        #tags:
-        #- family: "ansibletest215947"
       register: taggedresources 
     
     - name: Debug tagged resources
