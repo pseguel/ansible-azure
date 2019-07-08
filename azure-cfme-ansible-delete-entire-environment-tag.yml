@@ -29,8 +29,9 @@
   hosts: localhost
   gather_facts: false
   connection: local
-  var: 
-  - mytags: ["family":"{{ familytags }}"]
+  vars: 
+    mytags: 
+      family: "{{familytags }}"
 
   # Getting facts!
   tasks:
