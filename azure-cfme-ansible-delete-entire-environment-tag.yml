@@ -30,8 +30,7 @@
   gather_facts: false
   connection: local
   vars: 
-    mytags: 
-    - 'family:{{ familytags }}'
+    mytags: ['family:{{ familytags }}']
 
   # Getting facts!
   tasks:
