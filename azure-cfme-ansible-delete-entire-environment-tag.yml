@@ -46,6 +46,7 @@
 
     - name: Get VMs by tags
       azure_rm_virtualmachine_facts:
+        resource_group: "{{ taggedresources.resourcegroups[0].name }}" 
         tags: "{{ mytags }}"
       register: taggedvms
 
