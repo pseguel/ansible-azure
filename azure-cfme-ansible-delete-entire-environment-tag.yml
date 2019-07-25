@@ -11,20 +11,7 @@
 #                                                                                              #
 # Enjoy!                                                                                       #
 ################################################################################################
-################################################################################################
-# Deleting an Entire Environment in Microsoft Azure                                            #
-#                                                                                              #
-# By Robert J. Calva - Red Hat LATAM - 2016                                                    #
-#                                                                                              #
-# NOTE: just set the location, Resoruce Group, Storage Account, Virtual Network, Public IP,    #
-# Security Group and more variables as you wish!                                               #
-#                                                                                              #
-# IMPORTANT: for further information about Microsoft Azure, please take a look at this link:   #
-# https://docs.microsoft.com/en-us/azure/                                                      #
-#                                                                                              #
-# Enjoy!                                                                                       #
-################################################################################################
-
+---
 - name: Delete an entire Environment in Azure
   hosts: localhost
   gather_facts: false
@@ -46,7 +33,7 @@
 
     - name: Get VMs by tags
       azure_rm_virtualmachine_facts:
-        resource_group: "{{ taggedresources.resourcegroups[0].name }}" 
+        resource_group: "{{ taggedresources.ansible_facts.azure_resourcegroups[0].name }}" 
         tags: "{{ mytags }}"
       register: taggedvms
 
@@ -57,7 +44,7 @@
            
 - hosts: localhost  
   vars: 
-    resourcegroup: "{{ taggedresources.resourcegroups[0].name }}"
+    resource_group: "{{ taggedresources.ansible_facts.azure_resourcegroups[0].name }}" 
     vmname: "{{ taggedvms.vms[0].name }}"
     virtualnetwork: "{{ taggedvirtualnetwork.subnets }}"
     storageaccount: "{{ taggedvms.vms[0].storage_account_name }}"
