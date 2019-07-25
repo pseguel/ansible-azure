@@ -59,7 +59,7 @@
         
     - name: Delete virtual machine
       azure_rm_virtualmachine:
-        resource_group: "{{ resourcegroup }}"
+        resource_group: "{{ resource_group }}"
         name: "{{ vmname }}"
         state: absent
         remove_on_absent: all
