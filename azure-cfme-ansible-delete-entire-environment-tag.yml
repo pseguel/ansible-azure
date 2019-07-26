@@ -92,9 +92,9 @@
 #        state: absent
 #        account_type: Standard_LRS
 # 
-    - name: Delete a resource group
-      azure_rm_resourcegroup:
-        name: "{{ resource_group }}"
-        location: "{{ location }}"
-        #force_delete_nonempty: yes
-        state: absent
+#    - name: Delete a resource group
+#      azure_rm_resourcegroup:
+#        name: "{{ resource_group }}"
+#        location: "{{ location }}"
+#        force_delete_nonempty: yes
+#        state: absent
